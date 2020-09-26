@@ -5,8 +5,8 @@
 
 class io_manager {
 private:
-  std::fstream input_file;
-  std::vector<std::string> uploaded_file;
+  std::fstream io_file;
+  std::vector<std::string> io_uploaded_file;
 public:
   io_manager(const std::string);
   ~io_manager();
