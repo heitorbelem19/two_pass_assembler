@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include "io_manager.hpp"
+#include "pre_processor.hpp"
 
 int main(int argc, char** argv){
   /*
@@ -9,9 +10,12 @@ int main(int argc, char** argv){
   io_manager file_stream(argv[2]);
   std::vector<std::string> uploaded_file_stream = file_stream.get_uploaded_file();
 
-  for (int i = 0; i < uploaded_file_stream.size(); i++) {
-    std::cout << uploaded_file_stream[i] << std::endl;  
-  }
+  pre_processor pre_processamento;
+  pre_processamento.process(uploaded_file_stream);
   
+  for(int i=0; i<uploaded_file_stream.size(); i++){
+    std::cout << uploaded_file_stream[i] << std::endl;
+  }
+
   return 0;
 }
