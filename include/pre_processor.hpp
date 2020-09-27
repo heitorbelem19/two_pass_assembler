@@ -6,6 +6,8 @@
 class pre_processor {
 private:
   void remove_comments(std::string &line);
+  void remove_spaces(std::string &line);
+  void upper_all(std::string &line);
 public:
   pre_processor();
   ~pre_processor();

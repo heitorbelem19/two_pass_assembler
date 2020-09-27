@@ -1,5 +1,5 @@
 SECTION TEXT ;tem que remover esse comentario
-MUL_N: MACRO 
+mul_n:                MACRO 
 MULT N
 STORE N
 ENDMACRO
@@ -9,10 +9,10 @@ FAT: SUB ONE
 JMPZ FIM
 STORE AUX ; e esse
 MUL_N 
-LOAD AUX
-JMP FAT
-FIM: OUTPUT N ; mais esse aqui
-STOP
+loAD AUX
+JMP Fat
+Fim: OUTPUT N ; mais esse aqui
+Stop
 SECTION DATA
 AUX: SPACE
 N: SPACE
