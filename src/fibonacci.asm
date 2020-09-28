@@ -5,19 +5,24 @@ STORE              N
 ENDMACRO
 INPUT         N ;esse tambem
 LOAD N
-FAT:
+FAT: 
 
+    ;oioioi
   SUB ONE
 COPY N1         M2
 JMPZ FIM
 STORE AUX ; e esse
 MUL_N 
 LABEL:
-loAD AUX
+     ;com
+          loAD AUX
 JMP Fat
-Fim: OUTPUT N ; mais esse aqui
+Fim: 
+
+  ;asdiasiod
+OUTPUT N ; mais esse aqui
 Stop
-SECTION DATA
+SECTION                 DATA
 AUX: SPACE
 N: SPACE
 ONE: CONST 1

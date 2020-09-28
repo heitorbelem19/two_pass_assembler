@@ -14,9 +14,25 @@ void pre_processor::process(std::vector<std::string> &uploaded_file){
 }
 
 void pre_processor::remove_comments(std::string &line){
-  int comment_pos = -1;
-  comment_pos = line.find(';', 0);
-  if(comment_pos >= 0)
+  int comment_pos = -1, char_pos = -1;
+  for(int i=0; i<line.size(); i++){
+    // se for aA~zZ
+    if((int)line[i] >= 65 && (int)line[i]<=90 || (int)line[i] >= 97 && (int)line[i]<=122){
+      if(char_pos == -1 || char_pos != -1 && char_pos > i)
+        char_pos = i;
+      else if(char_pos != -1 && char_pos < i)
+        continue;
+    }
+    else if(line[i] == ';'){
+      comment_pos = i;
+      break;
+    }
+  }
+  // não tem nenhuma letra na linha sem ser comentário
+  if(char_pos == -1)
+    line.erase(0, line.size());
+  // tem letra na linha e ela está antes de um comentário
+  else if(char_pos < comment_pos)
     line.erase(comment_pos, line.size());
 }
 
@@ -27,7 +43,7 @@ void pre_processor::upper_all(std::string &line){
 
 void pre_processor::remove_spaces(std::string &line){
   // Expressão regular para procurar sequência de caracteres
-  std::regex reg("([a-zA-Z0-9+;]([^ ]+)?)");
+  std::regex reg("([a-zA-Z0-9]([^ \n\r\t]+)?)");
   // Usado para procurar strings
   std::smatch matches;
   std::vector<std::string> words;
@@ -40,21 +56,24 @@ void pre_processor::remove_spaces(std::string &line){
     line = matches.suffix().str();
   }
   
-  std::string formated_word;
+  std::string formatted_word;
   /*
-    Deixa a string formated_word com os tokens separados
+    Deixa a string formatted_word com os tokens separados
     por um único espaço
   */
   for(int i=0; i<words.size(); i++){
-    formated_word.append(words[i]);
-    if(i != words.size() - 1)
-      formated_word.append(" ");
-    else
-      formated_word.append("\n");
+    if(words[i].size() != 0){
+      formatted_word.append(words[i]);
+      if(i != words.size() - 1)
+        formatted_word.append(" ");
+      else
+        formatted_word.append("\n");
+    }
   }
+
   // Remove linhas que estão em branco
-  if(!formated_word.empty())
-    line = formated_word;
+  if(!formatted_word.empty())
+    line = formatted_word;
 }
 
 void pre_processor::align_labels(std::vector<std::string> &uploaded_file){
