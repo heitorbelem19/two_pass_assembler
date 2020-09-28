@@ -1,14 +1,18 @@
 SECTION TEXT ;tem que remover esse comentario
 mul_n:                MACRO 
 MULT N
-STORE N
+STORE              N
 ENDMACRO
-INPUT N ;esse tambem
+INPUT         N ;esse tambem
 LOAD N
-FAT: SUB ONE
+FAT:
+
+  SUB ONE
+COPY N1         M2
 JMPZ FIM
 STORE AUX ; e esse
 MUL_N 
+LABEL:
 loAD AUX
 JMP Fat
 Fim: OUTPUT N ; mais esse aqui

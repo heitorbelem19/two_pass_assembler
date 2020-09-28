@@ -15,7 +15,7 @@ int main(int argc, char** argv){
   pre_processamento.process(uploaded_file);
   
   for(int i=0; i<uploaded_file.size(); i++){
-    std::cout << uploaded_file[i] << std::endl;
+    std::cout << uploaded_file[i];
   }
 
   return 0;
