@@ -5,10 +5,14 @@
 
 class pre_processor {
 private:
+  std::map<std::string, std::string> directives;
+  
   void remove_comments(std::string &line);
   void remove_spaces(std::string &line);
   void upper_all(std::string &line);
   void align_labels(std::vector<std::string> &uploaded_file);
+  void validate_directives(std::vector<std::string> &uploaded_file);
+  size_t split(const std::string &txt, std::vector<std::string> &strs, char ch);
 public:
   pre_processor();
   ~pre_processor();
