@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include "io_manager.hpp"
 #include "pre_processor.hpp"
+#include "assembler.hpp"
 
 int main(int argc, char** argv){
   /*
@@ -14,9 +15,12 @@ int main(int argc, char** argv){
   pre_processor pre_processamento;
   pre_processamento.process(uploaded_file);
   
-  for(int i=0; i<uploaded_file.size(); i++){
-    std::cout << uploaded_file[i] << '\n';
-  }
+  assembler montador;
+  montador.first_passage(uploaded_file);
+
+  // for(int i=0; i<uploaded_file.size(); i++){
+  //   std::cout << uploaded_file[i] << '\n';
+  // }
 
   return 0;
 }

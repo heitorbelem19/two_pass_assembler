@@ -5,10 +5,13 @@
 
 class assembler {
   private:
-    std::map<std::string, int> t_instructions;
+    int position_count;
+    int line_count;
+    std::map<std::string, std::pair<int,int>> t_instructions;
     std::map<std::string, int> t_directives;
     std::map<std::string, int> t_symbols;
   public:
+    void first_passage(std::vector<std::string> &pre_processed_file);
     assembler();
     ~assembler();
 };

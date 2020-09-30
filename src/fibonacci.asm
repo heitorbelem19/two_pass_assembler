@@ -1,4 +1,4 @@
-TrIANGuLO: 
+TrIANgulo: 
 ;comentario		
                 EQU 0
 ;comentrasa

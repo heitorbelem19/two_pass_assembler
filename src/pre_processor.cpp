@@ -106,7 +106,7 @@ void pre_processor::validate_directives(std::vector<std::string> &uploaded_file)
         int value_idx = j+1;
         std::string value = words[value_idx];
         //insere no map de diretivas (atributo da classe) => Somente se não existir a chave no map.
-        insert_return = directives.insert(std::make_pair(label,value));
+        insert_return = this->directives.insert(std::make_pair(label,value));
         if(insert_return.second == false){
           std::cerr << "Redefinição de Label" << std::endl;
           break;
@@ -118,8 +118,8 @@ void pre_processor::validate_directives(std::vector<std::string> &uploaded_file)
         std::map<std::string, std::string>::iterator directives_it;
         int label_idx = j+1;
         std::string label = words[label_idx];
-        directives_it = directives.find(label);
-        if(directives_it != directives.end()){
+        directives_it = this->directives.find(label);
+        if(directives_it != this->directives.end()){
           words[label_idx] = directives_it->second;
         }
         else{
