@@ -40,30 +40,32 @@ void pre_processor::remove_spaces(std::string &line){
 }
 
 void pre_processor::align_labels(std::vector<std::string> &uploaded_file){
-  int k = 0;
+  int i = 0;
   int count = 0;
   std::vector<int> labels_idx;
-  while(k<uploaded_file.size()){
-    if(uploaded_file[k].empty() || uploaded_file[k].size() == 0 || uploaded_file[k] == ""){
-      uploaded_file.erase(uploaded_file.begin() + k);
+  bool erase_white_spaces = false;
+  while(i<uploaded_file.size()){
+    if(uploaded_file[i].empty() || uploaded_file[i].size() == 0 || uploaded_file[i] == " "){
+      uploaded_file.erase(uploaded_file.begin() + i);
+      erase_white_spaces = true;
     }
-    else
-      k++;
-  }
-  
-  for(int i=0; i<uploaded_file.size(); i++){
-    int line_size = uploaded_file[i].size() - 1; // Penúltimo caracter, o último é sempre '\n'
-    // junta rótulo e instrução na mesma linha
-    if(uploaded_file[i][line_size] == ':'){
-      int j = i+1;
-      labels_idx.push_back(j);
-      uploaded_file[i].erase(line_size + 1, uploaded_file[i].size());
-      //uploaded_file.erase(uploaded_file.begin() + j - count);
-      std::string next_line = uploaded_file[j];
-      uploaded_file[i].append(" ").append(next_line);
+    else{
+      if(erase_white_spaces)
+        i--;
+      int line_size = uploaded_file[i].size() - 1; // Penúltimo caracter, o último é sempre '\n'
+      // junta rótulo e instrução na mesma linha
+      if(uploaded_file[i][line_size] == ':'){
+        int j = i+1;
+        if(!(uploaded_file[j].empty()) || !(uploaded_file[j].size() == 0)){
+          labels_idx.push_back(j);
+          uploaded_file[i].append(" ").append(uploaded_file[j]);
+        }
+      }
+      i++;
+      erase_white_spaces = false;
     }
   }
-  
+
   for(int i=0; i<labels_idx.size(); i++){
     uploaded_file.erase(uploaded_file.begin() + labels_idx[i] - count);
     count++;

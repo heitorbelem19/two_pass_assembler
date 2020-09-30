@@ -1,25 +1,23 @@
-COPY           ZERO,   OLDER
-COPY           ONE,    OLD
-INPUT          LIMIT
-OUTPUT         OLD
-FRONT:  LOAD           OLDER
-ADD            OLD
-STORE          NEW
-SUB            LIMIT
-JMPP           FINAL
-OUTPUT         NEW
-COPY           OLD,    OLDER
-COPY           NEW,    OLD
-JMP            FRONT
-FINAL:  OUTPUT         LIMIT
-STOP
-ZERO:   CONST          0
-ONE:    CONST          1
-OLDER:  SPACE
-OLD:    SPACE
-NEW:    
-;espaco na memoria
-SPACE
-								;mais um comentario
-LIMIT:  SPACE ;;comentario de comentario
-;comentario
+TrIANGuLO: 
+;comentario		
+                EQU 0
+;comentrasa
+
+SECTION TEXT	;linha dos dados
+		INPUT		B
+		INPUT		H
+		LOAD		B
+		MuLT		H
+		IF TRIANGULO
+		DIV		DOIS
+		STORE		R
+		OUTPUT	R
+		STOP
+SECTION DATA
+	B:		
+		SPACE
+	H:		
+		SPACE
+	R:		
+	SPACE 5 
+	DOIS:	CONST	
