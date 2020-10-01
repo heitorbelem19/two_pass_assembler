@@ -1,6 +1,6 @@
 TrIANgulo: 
 ;comentario		
-                EQU 0
+                EQU 1
 ;comentrasa
 
 SECTION TEXT	;linha dos dados
@@ -9,7 +9,7 @@ SECTION TEXT	;linha dos dados
 		LOAD		B
 		MuLT		H
 		IF TRIANGULO
-		DIV		DOIS
+		div        DOIS
 		STORE		R
 		OUTPUT	R
 		STOP

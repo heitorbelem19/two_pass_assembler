@@ -14,13 +14,12 @@ int main(int argc, char** argv){
   // Faz o pre processamento do arquivo .asm
   pre_processor pre_processamento;
   pre_processamento.process(uploaded_file);
-  
+  for(int i=0; i<uploaded_file.size(); i++){
+    std::cout << uploaded_file[i] << '\n';
+  }
+  std::cout << "--------------------" << std::endl;
   assembler montador;
   montador.first_passage(uploaded_file);
-
-  // for(int i=0; i<uploaded_file.size(); i++){
-  //   std::cout << uploaded_file[i] << '\n';
-  // }
-
+  
   return 0;
 }
