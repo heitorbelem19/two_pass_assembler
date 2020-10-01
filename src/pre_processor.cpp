@@ -50,7 +50,7 @@ void pre_processor::align_labels(std::vector<std::string> &uploaded_file){
       erase_white_spaces = true;
     }
     else{
-      if(erase_white_spaces)
+      if(erase_white_spaces && i>0)
         i--;
       int line_size = uploaded_file[i].size() - 1; // Penúltimo caracter, o último é sempre '\n'
       // junta rótulo e instrução na mesma linha

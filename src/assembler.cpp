@@ -18,7 +18,7 @@ assembler::assembler() {
   t_instructions.insert(std::make_pair("STOP", std::make_pair(14, 1)));
 
   // Tabela de diretivas: <DIRETIVA, TAMANHO>
-  t_directives.insert(std::make_pair("SECTION", 2));
+  t_directives.insert(std::make_pair("SECTION", 0));
   t_directives.insert(std::make_pair("SPACE", 1));
   t_directives.insert(std::make_pair("CONST", 1));
 
