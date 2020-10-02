@@ -19,7 +19,8 @@ int main(int argc, char** argv){
   }
   std::cout << "--------------------" << std::endl;
   assembler montador;
-  montador.first_passage(uploaded_file);
+  montador.first_pass(uploaded_file);
+  montador.second_pass(uploaded_file);
   
   return 0;
 }
