@@ -1,6 +1,7 @@
 #include "assembler.hpp"
 
 assembler::assembler() {
+
   // Tabela de instruções: <Mnemônico, <OPCODE , TAMANHO>>
   t_instructions.insert(std::make_pair("ADD", std::make_pair(1, 2)));
   t_instructions.insert(std::make_pair("SUB", std::make_pair(2, 2)));
@@ -28,6 +29,7 @@ assembler::~assembler() {
 }
 
 void assembler::first_pass(std::vector<std::string> &pre_processed_file){
+  errors.clear();
   std::regex get_tokens_reg("(\\w{1,}:?)");
   std::smatch matches;
   std::vector<std::string> tokens;
@@ -35,6 +37,8 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
   std::map<std::string, int>::iterator symbols_it;
   std::map<std::string, std::pair<int,int>>::iterator instructions_it;
   std::map<std::string, int>::iterator directives_it;
+
+  int error = -1;
 
   position_count = 0; // Inicializa PC
 
@@ -49,13 +53,21 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
     for(int i=0; i<tokens.size(); i++){
       // Se o token da linha for um Rótulo
       if(tokens[i].back() == ':'){ 
+        if(tokens[i+1].back() == ':'){
+          error = line_count;
+          errors.insert(std::make_pair(line_count, "ERRO: DOIS ROTULOS NA MESMA LINHA"));
+          break;
+        }
         // Remove os ':' da string 
         std::string label = tokens[i].erase(tokens[i].size()-1);
         // Procura na tabela de símbolos pra ver se esse rótulo já existe
         symbols_it = this->t_symbols.find(label);
         // Se já existir, retorna um erro e não insere o rótulo atual
-        if(symbols_it != this->t_symbols.end())
-          std::cout << "ERRO: Redefinição de rótulo\n";
+        if(symbols_it != this->t_symbols.end()){
+          error = line_count;
+          errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Redefinição de rótulo"));
+          break;
+        }
         // Se não existir, insere o rótulo na tabela
         else
           this->t_symbols.insert(std::make_pair(label, position_count));
@@ -78,11 +90,16 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
         }
         // Se não for nem instrução nem diretiva válida
         else {
-          std::cout << "ERRO -> Operacao nao identificada\n";
+          error = line_count;
+          errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Operacao invalida"));
           break;
         }
       }
     }
+    if(error != -1){
+      std::cout << errors.begin()->second << "\tLinha: " << errors.begin()->first << '\n';
+      break;
+    } 
   }
   std::cout << "Tabela de Simbolos\n";
   for(auto it = t_symbols.cbegin(); it != t_symbols.cend(); ++it) {
@@ -92,6 +109,7 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
 }
 
 void assembler::second_pass(std::vector<std::string> &pre_processed_file){
+  errors.clear();
   position_count = 0;
   std::vector<int> exe;
   std::regex get_tokens_reg("(\\w{1,}:?)");
@@ -101,21 +119,24 @@ void assembler::second_pass(std::vector<std::string> &pre_processed_file){
 
   std::map<std::string, std::pair<int,int>>::iterator instructions_it;
   std::map<std::string, int>::iterator directives_it;
-
+  int error = -1;
   for(line_count=0; line_count<pre_processed_file.size(); line_count++){
     std::string line = pre_processed_file[line_count];
     std::regex_match(line, matches, get_instruction_reg);
     std::string label = matches[1];
     std::string instruction = matches[2];
-    std::string operand1 = matches[3];
-    std::string operand2 = matches[6];
+    std::string operand1 = matches[3]; // avaliar token aqui
+    std::string operand2 = matches[6]; // avaliar token aqui
     std::string constant = matches[5];
-
-    eval_instruction(label, instruction, operand1, operand2, constant);
+    error = eval_instruction(label, instruction, operand1, operand2, constant, line_count);
+    if(error != -1){
+      std::cout << errors.begin()->second << "\tLinha: " << errors.begin()->first << '\n';
+      break;
+    }
   }
 }
 
-void assembler::eval_instruction(std::string label, std::string instruction, std::string op1, std::string op2, std::string constant){
+int assembler::eval_instruction(std::string label, std::string instruction, std::string op1, std::string op2, std::string constant, int line_count){
   std::vector<int> exec; // array que representa o que vai ser escrito no arquivo .o
   std::map<std::string, int>::iterator symbols_it_op1;
   std::map<std::string, int>::iterator symbols_it_op2;
@@ -131,6 +152,7 @@ void assembler::eval_instruction(std::string label, std::string instruction, std
       if(op_size == 1){ // STOP
         exec.push_back(opcode);
         position_count += op_size;
+        
       }
       else if(op_size == 2 && !(op1.empty())){ //  ADD N1
         symbols_it_op1 = t_symbols.find(op1); // procura o label
@@ -139,9 +161,11 @@ void assembler::eval_instruction(std::string label, std::string instruction, std
           exec.push_back(opcode); // insere opcode no array que vai ser convertido para o .o
           exec.push_back(mem_addr); // insere o end de memoria do label no array
           position_count += op_size;
+          
         }
         else{
-          std::cout << "Operando não definido\n";
+          errors.insert(std::make_pair(line_count, "ERRO SEMANTICO: Operando não definido"));
+          return line_count;
         }
       }
       else if(op_size == 3 && !op1.empty() && !op2.empty()){ // COPY N1, N2
@@ -154,37 +178,43 @@ void assembler::eval_instruction(std::string label, std::string instruction, std
           exec.push_back(mem_addr_op1);
           exec.push_back(mem_addr_op2);
           position_count += op_size;
+          
         }
         else {
-          std::cout << "Operando 1 OU Operando 2 não definido\n"; // pode mudar depois e separar em 2 ifs
+          errors.insert(std::make_pair(line_count, "ERRO SEMANTICO: Operando 1 OU Operando 2 não definido"));
+          return line_count;
         }
       }
       else{
-        std::cout << "Operacao Invalida\n";
+        errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Operacao Invalida"));
+        return line_count;
       }
     }
     else{
       directives_it = t_directives.find(instruction);
       if(directives_it != t_directives.end()){ // achou diretiva
-        if(directives_it->first == "CONST" && !constant.empty()){
-          exec.push_back(stoi(constant));
-          position_count += directives_it->second;
+        if(directives_it->first == "CONST"){
+          if(!constant.empty()){
+            exec.push_back(stoi(constant));
+            position_count += directives_it->second;
+            
+          }
+          else{
+            errors.insert(std::make_pair(line_count, "ERRO SINTATICO: DIRETIVA CONST INCORRETA"));
+            return line_count;
+          }
         }
         else if(directives_it->first == "SPACE"){
           exec.push_back(10000);
           position_count += directives_it->second;
-        }
-        else {
-          std::cout << "Diretiva SECTION\n";
+          
         }
       }
     }
   }
   else{
-    std::cout << "INSTRUÇÃO INVALIDA\n";
+    errors.insert(std::make_pair(line_count, "ERRO SINTATICO: INSTRUÇÃO INVALIDA"));
+    return line_count;
   }
-  std::cout << "End " << line_count << ": ";
-  for(int i=0; i<exec.size(); i++)
-    std::cout << exec[i] << " ";
-  std::cout << '\n';
+  return -1;
 }

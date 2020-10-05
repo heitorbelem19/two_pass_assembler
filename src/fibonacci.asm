@@ -1,4 +1,4 @@
-TrIANgulo: 
+TrIANGuLO: 
 ;comentario		
                 EQU 1
 ;comentrasa
@@ -9,7 +9,7 @@ SECTION TEXT	;linha dos dados
 		LOAD		B
 		MuLT		H
 		IF TRIANGULO
-		div        DOIS
+		DIV		DOIS
 		STORE		R
 		OUTPUT	R
 		STOP
@@ -20,4 +20,4 @@ SECTION DATA
 		SPACE
 	R:		
 	SPACE 5 
-	DOIS:	CONST	
+	DOIS:	CONST	2
