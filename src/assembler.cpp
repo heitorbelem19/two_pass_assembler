@@ -134,6 +134,8 @@ void assembler::second_pass(std::vector<std::string> &pre_processed_file){
   position_count = 0;
   std::vector<int> exe;
   std::regex get_tokens_reg("(\\w{1,}:?)");
+  // regex que separa em grupos: 
+  //  ROT(OPCIONAL) Instrucao(OBR) OP1(OPCIONAL) OP2(OPCIONAL) CONSTANT(OPCIONAL)
   std::regex get_instruction_reg("^(?:([A-Za-z_]\\w*): )?([A-Za-z]+)(?: ([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?(?:, ?)?(?:([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?$");
   std::smatch matches;
   std::vector<std::string> tokens;
@@ -144,14 +146,15 @@ void assembler::second_pass(std::vector<std::string> &pre_processed_file){
   for(line_count=0; line_count<pre_processed_file.size(); line_count++){
     std::string line = pre_processed_file[line_count];
     std::regex_match(line, matches, get_instruction_reg);
+    // extrai tokens da linha, separando por suas devidas posições
     std::string label = matches[1];
     std::string instruction = matches[2];
-    std::string operand1 = matches[3]; // avaliar token aqui
-    std::string operand2 = matches[6]; // avaliar token aqui
+    std::string operand1 = matches[3];
+    std::string operand2 = matches[6]; 
     std::string constant = matches[5];
 
     error = eval_instruction(label, instruction, operand1, operand2, constant, line_count, final_file);
-    if(error != -1){
+    if(error != -1){ // se deu algum erro durante a montagem, printa na tela e sai do programa.
       std::cout << errors.begin()->second << "\tLinha: " << errors.begin()->first + 1 << '\n';
       break;
     }
@@ -189,15 +192,15 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
               return line_count;
             }
           }
-          else{
+          else{ // Erro semantico
             if(symbols_it_op1->second.second == 1){
               errors.insert(std::make_pair(line_count, "ERRO SEMANTICO: Operando invalido"));
               return line_count;
             }
-          }
+          } // Ajusta o que vai ser escrito no arquivo, coloca o 0 antes se so tiver 1 digito
           if(opcode >= 1 && opcode <= 9) final_file << "0" << std::to_string(opcode) << " ";
           else final_file << std::to_string(opcode) << " ";
-
+          // Ajusta o que vai ser escrito no arquivo, coloca o 0 antes se so tiver 1 digito
           if(mem_addr >= 1 && mem_addr <= 9) final_file << "0" << std::to_string(mem_addr) << " ";
           else final_file << std::to_string(mem_addr) << " ";
           
@@ -213,16 +216,18 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
         errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Instrucao invalida"));
         return line_count;
       }
+      // SE a operacao for COPY, tem que ver os proximos 2 operandos  
       else if(op_size == 3 && !op1.empty() && !op2.empty() && constant.empty()){ // COPY N1, N2
         symbols_it_op1 = t_symbols.find(op1);
         symbols_it_op2 = t_symbols.find(op2);
-        if(symbols_it_op1 != t_symbols.end() && symbols_it_op2 != t_symbols.end()){
-          if(symbols_it_op1->second.second == 1 || symbols_it_op2->second.second == 1){
+        if(symbols_it_op1 != t_symbols.end() && symbols_it_op2 != t_symbols.end()){  // achou operandos na tabela de simbolos
+          if(symbols_it_op1->second.second == 1 || symbols_it_op2->second.second == 1){ // operandos são rótulos de linha => nãõ pode 
             errors.insert(std::make_pair(line_count, "ERRO SEMANTICO: Operando invalido"));
             return line_count;
           }
           int mem_addr_op1 = symbols_it_op1->second.first;
           int mem_addr_op2 = symbols_it_op2->second.first;
+          // Ajusta o que vai ser escrito no arquivo, coloca o 0 antes se so tiver 1 digito
           if(opcode >= 1 && opcode <= 9) final_file << "0" << std::to_string(opcode) << " ";
           else final_file << std::to_string(opcode) << " ";
           if(mem_addr_op1 >= 1 && mem_addr_op1 <= 9) final_file << "0" << std::to_string(mem_addr_op1) << " ";
@@ -236,7 +241,7 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
           return line_count;
         }
       }
-      // aqui era pra tratar o erro de token que não obedece a BNF
+      // aqui era pra tratar o erro de token que não obedece a BNF, mas deu erro
       else if(op_size == 3 && ( (op1.empty()) || (op2.empty())) ){
         errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Instrucao invalida"));
         return line_count;
@@ -251,13 +256,12 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
       directives_it = t_directives.find(instruction);
       if(directives_it != t_directives.end()){ // achou diretiva
         if(directives_it->first == "CONST"){
-          if(!constant.empty()){
-            if(!op2.empty()){
+          if(!constant.empty()){ // se tem valor depois da diretiva const
+            if(!op2.empty()){ // se diretiva const não for composta apenas de digitos e de '-'
               errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Diretiva CONST invalida"));
               return line_count;
             }
-            final_file << constant << " ";
-            //exec.push_back(stoi(constant));
+            final_file << constant << " "; // escreve no arquivo final na posicao certa
             position_count += directives_it->second;
           }
           else{
@@ -265,17 +269,16 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
             return line_count;
           }
         }
-        else if(directives_it->first == "SPACE"){
-          if(!op1.empty() || !op2.empty() || !constant.empty()){
-            errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Diretiva SPACE incorreta"));
+        else if(directives_it->first == "SPACE"){ // se for SPACE
+          if(!op1.empty() || !op2.empty() || !constant.empty()){ // se tiver qualquer coisa depois do space => errado
+            errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Diretiva SPACE incorreta")); 
             return line_count;
           }
-          final_file << "OO" << " ";
-          // exec.push_back(10000);
+          final_file << "OO" << " "; // escreve OO no arquivo final como foi requisitado
           position_count += directives_it->second;
         }
-        else if(directives_it->first == "SECTION"){
-          if(op1 != "TEXT" && op1 != "DATA"){
+        else if(directives_it->first == "SECTION"){ // se for SECTION
+          if(op1 != "TEXT" && op1 != "DATA"){ // não é seção válida
             errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Secao Invalida"));
             return line_count;
           }
