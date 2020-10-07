@@ -127,6 +127,9 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
 }
 
 void assembler::second_pass(std::vector<std::string> &pre_processed_file){
+  std::ofstream final_file;
+  final_file.open("montador.txt"); 
+
   errors.clear();
   position_count = 0;
   std::vector<int> exe;
@@ -147,15 +150,16 @@ void assembler::second_pass(std::vector<std::string> &pre_processed_file){
     std::string operand2 = matches[6]; // avaliar token aqui
     std::string constant = matches[5];
 
-    error = eval_instruction(label, instruction, operand1, operand2, constant, line_count);
+    error = eval_instruction(label, instruction, operand1, operand2, constant, line_count, final_file);
     if(error != -1){
       std::cout << errors.begin()->second << "\tLinha: " << errors.begin()->first + 1 << '\n';
       break;
     }
   }
+  final_file.close();
 }
 
-int assembler::eval_instruction(std::string label, std::string instruction, std::string op1, std::string op2, std::string constant, int line_count){
+int assembler::eval_instruction(std::string label, std::string instruction, std::string op1, std::string op2, std::string constant, int line_count, std::ofstream& final_file){
   std::vector<int> exec; // array que representa o que vai ser escrito no arquivo .o
   std::map<std::string, std::pair<int,int>>::iterator symbols_it_op1;
   std::map<std::string, std::pair<int,int>>::iterator symbols_it_op2;
@@ -169,7 +173,10 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
       int opcode = instructions_it->second.first;
       int op_size = instructions_it->second.second; // tamanho da operação
       if(op_size == 1 && op2.empty() && op1.empty() && constant.empty()){ // STOP
-        exec.push_back(opcode);
+        if(opcode >= 1 && opcode <= 9)
+          final_file << "0" << std::to_string(opcode) << " ";
+        else
+          final_file << std::to_string(opcode) << " ";
         position_count += op_size;
       }
       else if(op_size == 2 && !(op1.empty()) && op2.empty()){
@@ -188,8 +195,12 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
               return line_count;
             }
           }
-          exec.push_back(opcode); // insere opcode no array que vai ser convertido para o .o
-          exec.push_back(mem_addr); // insere o end de memoria do label no array
+          if(opcode >= 1 && opcode <= 9) final_file << "0" << std::to_string(opcode) << " ";
+          else final_file << std::to_string(opcode) << " ";
+
+          if(mem_addr >= 1 && mem_addr <= 9) final_file << "0" << std::to_string(mem_addr) << " ";
+          else final_file << std::to_string(mem_addr) << " ";
+          
           position_count += op_size;
         }
         else{
@@ -211,9 +222,12 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
           }
           int mem_addr_op1 = symbols_it_op1->second.first;
           int mem_addr_op2 = symbols_it_op2->second.first;
-          exec.push_back(opcode);
-          exec.push_back(mem_addr_op1);
-          exec.push_back(mem_addr_op2);
+          if(opcode >= 1 && opcode <= 9) final_file << "0" << std::to_string(opcode) << " ";
+          else final_file << std::to_string(opcode) << " ";
+          if(mem_addr_op1 >= 1 && mem_addr_op1 <= 9) final_file << "0" << std::to_string(mem_addr_op1) << " ";
+          else final_file << std::to_string(mem_addr_op1) << " ";
+          if(mem_addr_op2 >= 1 && mem_addr_op2 <= 9) final_file << "0" << std::to_string(mem_addr_op2) << " ";
+          else final_file << std::to_string(mem_addr_op2) << " ";
           position_count += op_size;
         }
         else {
@@ -240,7 +254,8 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
               errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Diretiva CONST invalida"));
               return line_count;
             }
-            exec.push_back(stoi(constant));
+            final_file << constant << " ";
+            //exec.push_back(stoi(constant));
             position_count += directives_it->second;
           }
           else{
@@ -253,7 +268,8 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
             errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Diretiva SPACE incorreta"));
             return line_count;
           }
-          exec.push_back(10000);
+          final_file << "OO" << " ";
+          // exec.push_back(10000);
           position_count += directives_it->second;
         }
         else if(directives_it->first == "SECTION"){
