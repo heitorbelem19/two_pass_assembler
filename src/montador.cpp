@@ -16,7 +16,7 @@ int main(int argc, char** argv){
     pre_processor pre_processamento;
     pre_processamento.process(uploaded_file);
     std::ofstream pre_process_file;
-    pre_process_file.open("montadorpre.txt");
+    pre_process_file.open("montador.PRE");
     for(int i=0; i<uploaded_file.size(); i++){
       pre_process_file << uploaded_file[i] << '\n';
     }

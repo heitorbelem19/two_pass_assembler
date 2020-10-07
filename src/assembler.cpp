@@ -128,7 +128,7 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
 
 void assembler::second_pass(std::vector<std::string> &pre_processed_file){
   std::ofstream final_file;
-  final_file.open("montador.txt"); 
+  final_file.open("montador.O"); 
 
   errors.clear();
   position_count = 0;
