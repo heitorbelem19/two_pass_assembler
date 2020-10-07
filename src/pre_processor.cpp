@@ -25,8 +25,6 @@ void pre_processor::upper_all(std::string &line){
 }
 
 void pre_processor::remove_spaces(std::string &line){
-  // Expressão regular para substituir espaços no início
-  std::regex init_space_reg("(^\\s{1,})?(\\s{1,}[^\\w])?($\\s{1,})?");
   // Expressão regular para remover espaços duplicados
   std::regex emptyline_reg("([ ]+|[\\s\n\r\t]+)");
   // Usado para procurar strings
@@ -34,7 +32,6 @@ void pre_processor::remove_spaces(std::string &line){
   std::vector<std::string> words;
 
   line = std::regex_replace(line, emptyline_reg, " ");
-  line = std::regex_replace(line, init_space_reg, "");
   line = std::regex_replace(line, std::regex("\\s+$"), std::string(""));
   line = std::regex_replace(line, std::regex("^\\s+"), std::string(""));
 }

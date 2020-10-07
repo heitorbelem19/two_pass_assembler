@@ -134,7 +134,7 @@ void assembler::second_pass(std::vector<std::string> &pre_processed_file){
   position_count = 0;
   std::vector<int> exe;
   std::regex get_tokens_reg("(\\w{1,}:?)");
-  std::regex get_instruction_reg("^(?:([A-Za-z_]\\w*): )?([A-Za-z]+)(?: ([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?(?:, )?(?:([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?$");
+  std::regex get_instruction_reg("^(?:([A-Za-z_]\\w*): )?([A-Za-z]+)(?: ([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?(?:, ?)?(?:([A-Za-z_]\\w*))?(?: ([+-]) )?(?: ?([-\\d]+))?$");
   std::smatch matches;
   std::vector<std::string> tokens;
 
