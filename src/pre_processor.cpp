@@ -120,7 +120,7 @@ void pre_processor::validate_directives(std::vector<std::string> &uploaded_file)
           words[label_idx] = directives_it->second;
         }
         else{
-          std::cout << "nao achei diretiva " << '\n';
+          std::cout << "ERRO SEMANTICO: IF sem EQU" << '\n';
           break;
         }
         directives_idx.push_back(i);
