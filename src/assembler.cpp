@@ -208,8 +208,9 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
           return line_count;
         }
       }
+      // aqui era pra tratar o erro de token que não obedece a BNF
       else if(op_size == 2 && (op1.empty())){
-        errors.insert(std::make_pair(line_count, "ERRO LEXICO: Token invalido"));
+        errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Instrucao invalida"));
         return line_count;
       }
       else if(op_size == 3 && !op1.empty() && !op2.empty() && constant.empty()){ // COPY N1, N2
@@ -235,8 +236,9 @@ int assembler::eval_instruction(std::string label, std::string instruction, std:
           return line_count;
         }
       }
+      // aqui era pra tratar o erro de token que não obedece a BNF
       else if(op_size == 3 && ( (op1.empty()) || (op2.empty())) ){
-        errors.insert(std::make_pair(line_count, "ERRO LEXICO: Token invalido"));
+        errors.insert(std::make_pair(line_count, "ERRO SINTATICO: Instrucao invalida"));
         return line_count;
       }
       else{
