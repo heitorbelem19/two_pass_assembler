@@ -8,6 +8,9 @@ int main(int argc, char** argv){
     Carrega arquivo para a memória
     Salva na instância uploaded_file_stream;
   */
+  std::regex remove_extension_reg("(.asm)");
+  std::string output_file_name = argv[2];
+
   io_manager file_input(argv[2]);
   std::vector<std::string> uploaded_file = file_input.get_uploaded_file();
   
@@ -16,7 +19,8 @@ int main(int argc, char** argv){
     pre_processor pre_processamento;
     pre_processamento.process(uploaded_file);
     std::ofstream pre_process_file;
-    pre_process_file.open("montador.PRE");
+    std::string file_out = std::regex_replace(output_file_name, remove_extension_reg, ".PRE");
+    pre_process_file.open(file_out);
     for(int i=0; i<uploaded_file.size(); i++){
       pre_process_file << uploaded_file[i] << '\n';
     }
@@ -27,7 +31,7 @@ int main(int argc, char** argv){
     pre_processamento.process(uploaded_file);
     assembler montador;
     montador.first_pass(uploaded_file);
-    montador.second_pass(uploaded_file);
+    montador.second_pass(uploaded_file, output_file_name);
   }
   else{
     std::cout << "Diretiva invalida\n";

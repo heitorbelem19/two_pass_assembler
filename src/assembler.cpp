@@ -126,9 +126,11 @@ void assembler::first_pass(std::vector<std::string> &pre_processed_file){
   }
 }
 
-void assembler::second_pass(std::vector<std::string> &pre_processed_file){
+void assembler::second_pass(std::vector<std::string> &pre_processed_file, std::string file_name){
   std::ofstream final_file;
-  final_file.open("montador.O"); 
+  std::regex remove_extension_reg("(.asm)");
+  std::string file_out = std::regex_replace(file_name, remove_extension_reg, ".O");
+  final_file.open(file_out); 
 
   errors.clear();
   position_count = 0;
