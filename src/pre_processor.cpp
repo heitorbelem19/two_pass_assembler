@@ -71,14 +71,11 @@ void pre_processor::align_labels(std::vector<std::string> &uploaded_file){
 }
 
 void pre_processor::validate_directives(std::vector<std::string> &uploaded_file){
-  if ((uploaded_file[0].find("SECTION TEXT") != std::string::npos) == 1){
-    return;
-  }
   std::vector<int> directives_idx; // indice das linhas que tem as diretivas
   std::string word_no_directives;
   std::vector<std::string> formatted_word;
   std::pair<std::map<std::string, std::string>::iterator,bool> insert_return; // indica já tem a mesma chave no map de diretivas
-  std::regex reg("(\\w{1,}\\,?:?)");
+  std::regex reg("([\\w|\\+\\-]{1,}\\,?:?)");
   std::smatch matches;
   std::vector<std::string> words;
   for(int i=0; i<uploaded_file.size(); i++){
@@ -128,7 +125,27 @@ void pre_processor::validate_directives(std::vector<std::string> &uploaded_file)
           directives_idx.push_back(i+1);
         }
       }
-      
+      else {  
+        std::map<std::string, std::string>::iterator directives_it;
+        std::string label;
+        
+        if(words[j][words[j].length() - 1] == ','){
+          label = words[j].substr(0, words[j].length() - 1);
+          directives_it = this->directives.find(label);
+          if(directives_it != this->directives.end()){
+            words[j].replace(0, words[j].length() - 1, directives_it->second);
+        }
+        }
+        else{
+          label = words[j];
+          directives_it = this->directives.find(label);
+          if(directives_it != this->directives.end()){
+            words[j].replace(0, words[j].length(), directives_it->second);
+          }
+        }
+        
+        
+      }
       if(j < words.size() - 1){
         word_no_directives.append(words[j]).append(" ");
       }

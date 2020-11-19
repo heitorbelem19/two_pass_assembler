@@ -5,7 +5,8 @@
 ### Nome: Heitor de Lima Belém
 ### Matrícula: 16/0123950
 ---
-
+# Opção escolhida: Montador de duas passagens com detecção de erros
+---
 ## Instruções para compilação
 1. Verifique se, na pasta **montador_sb01/src** existe a pasta **obj**:
   - Se não existir crie essa pasta (**obj**) dentro de **montador_sb01/src/** e vá para o passo _2_
@@ -23,6 +24,7 @@
     ```
       ./montador -o <nome_do_arquivo>.asm
     ```
+  **OBS**: o arquivo *.asm* deve estar na pasta **montador_sb01/src**
   
   ### Exemplo de Pre processamento:
   
@@ -38,5 +40,8 @@
 
     Arquivo de saída: triangulo.OBJ
   ```
+# Observações Importantes sobre o Trabalho
+## Trabalho feito no Linux usando MakeFile
+## Os arquivos de saída são armazenados na pasta montador_sb01/src
 
     
